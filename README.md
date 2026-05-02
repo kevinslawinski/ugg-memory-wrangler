@@ -123,7 +123,7 @@ Releases use a two-step process to satisfy GitHub's immutable release setting (a
 **Step 1 — Push a version tag.** The Actions workflow builds `ugg-memory-wrangler.exe`, generates `checksums.txt`, and creates a **draft** release with both files attached.
 
 ```powershell
-git tag v1.0.0
+git tag -a v1.0.0 -m "Release v1.0.0"
 git push origin v1.0.0
 ```
 
