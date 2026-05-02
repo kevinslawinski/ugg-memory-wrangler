@@ -932,19 +932,23 @@ func main() {
 		}
 	}
 
-	m, err := loadMetrics(metricsPath)
-	if err == nil {
-		m.Runs++
-		m.LastFreedBytes = freedBytes
-		m.LastBeforeBytes = beforeBytes
-		if freedBytes > 0 {
-			m.TotalFreedBytes += freedBytes
+	m, metricsErr := loadMetrics(metricsPath)
+	if metricsErr != nil {
+		if !autoPopup {
+			fmt.Fprintf(os.Stderr, "  warning: could not read metrics, resetting: %v\n", metricsErr)
 		}
-		m.UpdatedAt = time.Now().Format(time.RFC3339)
-		if saveErr := saveMetrics(metricsPath, m); saveErr == nil {
-			lifetimeTotalBytes = m.TotalFreedBytes
-			lifetimeRuns = m.Runs
-		}
+		m = metrics{}
+	}
+	m.Runs++
+	m.LastFreedBytes = freedBytes
+	m.LastBeforeBytes = beforeBytes
+	if freedBytes > 0 {
+		m.TotalFreedBytes += freedBytes
+	}
+	m.UpdatedAt = time.Now().Format(time.RFC3339)
+	if saveErr := saveMetrics(metricsPath, m); saveErr == nil {
+		lifetimeTotalBytes = m.TotalFreedBytes
+		lifetimeRuns = m.Runs
 	}
 
 	_ = appendLog(logPath, *name, beforeBytes, afterBytes, freedBytes)
