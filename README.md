@@ -1,5 +1,12 @@
 # U.GG Memory Wrangler
 
+[![Latest Release](https://img.shields.io/github/v/release/kevinslawinski/ugg-memory-wrangler?style=flat-square&color=0078d4)](https://github.com/kevinslawinski/ugg-memory-wrangler/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/kevinslawinski/ugg-memory-wrangler/total?style=flat-square&color=4ec9b0)](https://github.com/kevinslawinski/ugg-memory-wrangler/releases)
+[![Build](https://img.shields.io/github/actions/workflow/status/kevinslawinski/ugg-memory-wrangler/release.yml?style=flat-square)](https://github.com/kevinslawinski/ugg-memory-wrangler/actions/workflows/release.yml)
+[![Go version](https://img.shields.io/github/go-mod/go-version/kevinslawinski/ugg-memory-wrangler?style=flat-square)](go.mod)
+[![Platform](https://img.shields.io/badge/platform-windows-0078d4?style=flat-square&logo=windows)](https://github.com/kevinslawinski/ugg-memory-wrangler/releases/latest)
+[![License](https://img.shields.io/github/license/kevinslawinski/ugg-memory-wrangler?style=flat-square)](LICENSE)
+
 A lightweight Windows utility that restarts [U.GG](https://u.gg) to reclaim memory that accumulates during long sessions. Double-click to run — no configuration required.
 
 ---
