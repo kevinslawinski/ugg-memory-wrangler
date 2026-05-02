@@ -111,14 +111,18 @@ To reset all data, delete the `%APPDATA%\ugg-memory-wrangler\` folder.
 
 ## Building a release (maintainer notes)
 
-Releases are built and published automatically by GitHub Actions when a version tag is pushed:
+Releases use a two-step process to satisfy GitHub's immutable release setting (assets must be uploaded before a release is published):
+
+**Step 1 — Push a version tag.** The Actions workflow builds `ugg-memory-wrangler.exe`, generates `checksums.txt`, and creates a **draft** release with both files attached.
 
 ```powershell
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The workflow (`.github/workflows/release.yml`) builds `ugg-memory-wrangler.exe` on `windows-latest`, generates a `checksums.txt`, and attaches both to the GitHub Release. Tags containing a `-` (e.g. `v1.0.0-beta`) are automatically published as pre-releases.
+**Step 2 — Publish the draft.** Go to the repo's [Releases](../../releases) page, review the auto-generated release notes, and click **Publish release**.
+
+Tags containing a `-` (e.g. `v1.0.0-rc.1`) are automatically marked as pre-releases.
 
 ---
 

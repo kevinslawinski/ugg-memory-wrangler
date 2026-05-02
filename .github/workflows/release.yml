@@ -38,5 +38,5 @@ jobs:
             ugg-memory-wrangler.exe
             checksums.txt
           generate_release_notes: true
-          draft: false
+          draft: true
           prerelease: ${{ contains(github.ref_name, '-') }}
