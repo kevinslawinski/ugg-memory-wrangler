@@ -830,18 +830,32 @@ func main() {
 		}
 	}
 
-	m, err := loadMetrics(metricsPath)
-	if err == nil {
-		m.Runs++
-		m.LastFreedBytes = freedBytes
-		m.LastBeforeBytes = beforeBytes
-		if freedBytes > 0 {
-			m.TotalFreedBytes += freedBytes
+	m, metricsErr := loadMetrics(metricsPath)
+	if metricsErr != nil {
+		if !autoPopup {
+			fmt.Fprintf(os.Stderr, "  warning: could not read metrics, starting fresh this run: %v\n", metricsErr)
+		} else {
+			prog.Message = fmt.Sprintf("Warning: could not read metrics, starting fresh this run: %v", metricsErr)
+			updateProgress()
 		}
-		m.UpdatedAt = time.Now().Format(time.RFC3339)
-		if saveErr := saveMetrics(metricsPath, m); saveErr == nil {
-			lifetimeTotalBytes = m.TotalFreedBytes
-			lifetimeRuns = m.Runs
+		m = metrics{}
+	}
+	m.Runs++
+	m.LastFreedBytes = freedBytes
+	m.LastBeforeBytes = beforeBytes
+	if freedBytes > 0 {
+		m.TotalFreedBytes += freedBytes
+	}
+	m.UpdatedAt = time.Now().Format(time.RFC3339)
+	if saveErr := saveMetrics(metricsPath, m); saveErr == nil {
+		lifetimeTotalBytes = m.TotalFreedBytes
+		lifetimeRuns = m.Runs
+	} else {
+		if !autoPopup {
+			fmt.Fprintf(os.Stderr, "  warning: could not save metrics: %v\n", saveErr)
+		} else {
+			prog.Message = fmt.Sprintf("Warning: could not save metrics: %v", saveErr)
+			updateProgress()
 		}
 	}
 
