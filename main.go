@@ -115,7 +115,7 @@ func liveWindowXAML() string {
 // that polls statusFile every 250ms, animating steps in as they complete.
 // Returns immediately; the window stays open until the user clicks Close.
 func showLiveWindow(statusFile, logPath string) {
-	xamlPath := filepath.Join(os.TempDir(), "ugg-memory-wrangler-ui.xaml")
+	xamlPath := filepath.Join(os.TempDir(), fmt.Sprintf("ugg-memory-wrangler-%d-ui.xaml", os.Getpid()))
 	if err := os.WriteFile(xamlPath, []byte(liveWindowXAML()), 0o644); err != nil {
 		return
 	}
@@ -721,7 +721,7 @@ func main() {
 	// In GUI mode: start the live window immediately after path is resolved,
 	// before any long-running work begins.
 	if autoPopup {
-		progressFile = filepath.Join(os.TempDir(), "ugg-memory-wrangler-progress.json")
+		progressFile = filepath.Join(os.TempDir(), fmt.Sprintf("ugg-memory-wrangler-%d-progress.json", os.Getpid()))
 		writeProgress(progressFile, progressState{Status: "working"})
 		showLiveWindow(progressFile, logPath)
 	}
