@@ -382,7 +382,7 @@ func getExePathByKeyword(keyword string) string {
 		return ""
 	}
 	cmd := fmt.Sprintf(
-		`$p=(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.ProcessName -match '(?i)%s' } | Select-Object -First 1 -ExpandProperty Path); if ($p) { $p }`,
+		`$k=[regex]::Escape('%s'); $p=(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.ProcessName -match ('(?i)'+$k) } | Select-Object -First 1 -ExpandProperty Path); if ($p) { $p }`,
 		psSingleQuote(keyword),
 	)
 	out, err := hiddenCmd(
