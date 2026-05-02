@@ -824,6 +824,15 @@ func main() {
 		}
 	}
 
+	// If -path was supplied explicitly and -name was not overridden, sync *name
+	// from the exe basename so that waitForWindow and isRunning check the correct
+	// image name instead of the default "U.GG.exe".
+	if exePath != "" && *name == defaultProcessName {
+		if base := strings.ToLower(filepath.Base(exePath)); base != "" {
+			*name = base
+		}
+	}
+
 	// In GUI mode: start the live window immediately after path is resolved,
 	// before any long-running work begins.
 	if autoPopup {
@@ -896,7 +905,7 @@ func main() {
 	}
 	// Wait until U.GG's window is actually visible on screen before reporting done.
 	if !waitForWindow(*name, 30*time.Second) && !isRunning(*name) {
-		fail("U.GG exited unexpectedly after launch")
+		fail("%s exited unexpectedly after launch", *name)
 	}
 	out("done")
 	prog.Starting = "done"
