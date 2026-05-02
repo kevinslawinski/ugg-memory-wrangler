@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: |
+          go build -ldflags="-H windowsgui -s -w" -o ugg-memory-wrangler.exe .
+
+      - name: Generate checksum
+        run: |
+          $hash = (Get-FileHash ugg-memory-wrangler.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  ugg-memory-wrangler.exe" | Out-File -Encoding ascii checksums.txt
+          Write-Host "SHA-256: $hash"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ugg-memory-wrangler.exe
+            checksums.txt
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
