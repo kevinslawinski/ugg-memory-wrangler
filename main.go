@@ -935,7 +935,10 @@ func main() {
 	m, metricsErr := loadMetrics(metricsPath)
 	if metricsErr != nil {
 		if !autoPopup {
-			fmt.Fprintf(os.Stderr, "  warning: could not read metrics, resetting: %v\n", metricsErr)
+			fmt.Fprintf(os.Stderr, "  warning: could not read metrics, starting fresh this run: %v\n", metricsErr)
+		} else {
+			prog.Message = fmt.Sprintf("Warning: could not read metrics, starting fresh this run: %v", metricsErr)
+			updateProgress()
 		}
 		m = metrics{}
 	}
@@ -949,6 +952,13 @@ func main() {
 	if saveErr := saveMetrics(metricsPath, m); saveErr == nil {
 		lifetimeTotalBytes = m.TotalFreedBytes
 		lifetimeRuns = m.Runs
+	} else {
+		if !autoPopup {
+			fmt.Fprintf(os.Stderr, "  warning: could not save metrics: %v\n", saveErr)
+		} else {
+			prog.Message = fmt.Sprintf("Warning: could not save metrics: %v", saveErr)
+			updateProgress()
+		}
 	}
 
 	_ = appendLog(logPath, *name, beforeBytes, afterBytes, freedBytes)
