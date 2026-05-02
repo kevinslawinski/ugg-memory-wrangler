@@ -699,20 +699,6 @@ func appendLog(path string, processName string, beforeBytes int64, afterBytes in
 	return err
 }
 
-func formatBytes(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
-	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	suffixes := []string{"KB", "MB", "GB", "TB"}
-	return fmt.Sprintf("%.2f %s", float64(bytes)/float64(div), suffixes[exp])
-}
-
 func formatMemory(bytes int64) string {
 	const mb = 1024 * 1024
 	const gb = 1024 * mb
