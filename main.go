@@ -515,7 +515,8 @@ func waitForExit(processName string, timeout time.Duration) bool {
 
 // waitForWindow runs a single hidden PowerShell process that polls internally
 // until any instance of the named process has a visible main window, or until
-// the timeout expires. One process, no flash loop.
+// the timeout expires. Returns false immediately if the process exits without
+// ever showing a window (e.g. crashed on launch). One process, no flash loop.
 func waitForWindow(processName string, timeout time.Duration) bool {
 	psName := strings.TrimSuffix(processName, ".exe")
 	secs := int(timeout.Seconds())
@@ -523,6 +524,7 @@ func waitForWindow(processName string, timeout time.Duration) bool {
 		`$n=[regex]::Escape('%s'); $end=(Get-Date).AddSeconds(%d); `+
 			`while ((Get-Date) -lt $end) { `+
 			`if (Get-Process -EA SilentlyContinue | Where-Object { $_.ProcessName -match ('(?i)^'+$n) -and $_.MainWindowHandle -ne 0 }) { exit 0 }; `+
+			`if (-not (Get-Process -EA SilentlyContinue | Where-Object { $_.ProcessName -match ('(?i)^'+$n) })) { exit 2 }; `+
 			`Start-Sleep -Milliseconds 500 }; exit 1`,
 		psSingleQuote(psName), secs,
 	)
@@ -707,6 +709,15 @@ func main() {
 		}
 	}
 
+	// If -path was supplied explicitly and -name was not overridden, sync *name
+	// from the exe basename so that waitForWindow and isRunning check the correct
+	// image name instead of the default "U.GG.exe".
+	if exePath != "" && *name == defaultProcessName {
+		if base := strings.ToLower(filepath.Base(exePath)); base != "" {
+			*name = base
+		}
+	}
+
 	// In GUI mode: start the live window immediately after path is resolved,
 	// before any long-running work begins.
 	if autoPopup {
@@ -778,7 +789,9 @@ func main() {
 		fail("launch failed: %v", err)
 	}
 	// Wait until U.GG's window is actually visible on screen before reporting done.
-	waitForWindow(*name, 30*time.Second)
+	if !waitForWindow(*name, 30*time.Second) && !isRunning(*name) {
+		fail("%s exited unexpectedly after launch", *name)
+	}
 	out("done")
 	prog.Starting = "done"
 	updateProgress()
