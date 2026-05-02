@@ -845,7 +845,13 @@ func main() {
 		}
 	}
 
-	_ = appendLog(logPath, *name, beforeBytes, afterBytes, freedBytes)
+	if logErr := appendLog(logPath, *name, beforeBytes, afterBytes, freedBytes); logErr != nil {
+		if !autoPopup {
+			fmt.Fprintf(os.Stderr, "  warning: could not write to log: %v\n", logErr)
+		} else {
+			prog.Message = fmt.Sprintf("Warning: could not write to log: %v", logErr)
+		}
+	}
 
 	// Console summary (CLI only)
 	out("  " + strings.Repeat("─", 36))
